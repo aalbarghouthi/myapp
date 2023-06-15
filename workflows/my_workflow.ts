@@ -1,4 +1,3 @@
-import { GetManifest } from "deno-slack-sdk/functions";
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
 
 const MsgWorkflow = DefineWorkflow({
@@ -14,27 +13,10 @@ const MsgWorkflow = DefineWorkflow({
   },
 });
 
-let lastHelpEvent = 0;
-
-rtm.on('message', (payload) => {
-  const now = Date.now();
-  if (payload.text === "help" && now - lastHelpEvent > 30000) {
-    lastHelpEvent = now;
-    handleMessage(payload);
-  }
+MsgWorkflow.addStep(Schema.slack.functions.SendMessage, {
+  user_id: MsgWorkflow.inputs.user_id,
+  channel_id: MsgWorkflow.inputs.channel_id,
+  message: "Hello World!",
 });
-
-async function handleMessage(payload) {
-  const now = Date.now();
-  if (payload.text === "help" && now - lastHelpPost > 30000) {
-    lastHelpPost = now;
-    
-    MsgWorkflow.addStep(Schema.slack.functions.SendMessage, {
-      channel_id: PostWorkflow.inputs.channel_id,
-      user_id: PostWorkflow.inputs.user_id,
-      message: "Hi",
-    });
-  }  
-}
 
 export default MsgWorkflow;
